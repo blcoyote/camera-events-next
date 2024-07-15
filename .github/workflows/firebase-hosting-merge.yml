@@ -18,3 +18,5 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_CAMERA_EVENTS_F329E }}
           channelId: live
           projectId: camera-events-f329e
+        env:
+          FIREBASE_CLI_EXPERIMENTS: webframeworks
