@@ -1,48 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { authMiddleware, redirectToHome, redirectToLogin } from 'next-firebase-auth-edge';
-import { clientConfig, serverConfig } from './config';
+import { serverConfig } from './config';
+import { HOME_ROUTE, ROOT_ROUTE } from './constants';
 
-const PUBLIC_PATHS = ['/register', '/login'];
+const protectedRoutes = [HOME_ROUTE];
 
 export async function middleware(request: NextRequest) {
-  return authMiddleware(request, {
-    loginPath: '/api/login',
-    logoutPath: '/api/logout',
-    apiKey: clientConfig.apiKey,
-    cookieName: serverConfig.cookieName,
-    cookieSignatureKeys: serverConfig.cookieSignatureKeys,
-    cookieSerializeOptions: serverConfig.cookieSerializeOptions,
-    serviceAccount: serverConfig.serviceAccount,
-    handleValidToken: async ({ token, decodedToken }, headers) => {
-      if (PUBLIC_PATHS.includes(request.nextUrl.pathname)) {
-        return redirectToHome(request);
-      }
+  const session = request.cookies.get(serverConfig.cookieName)?.value || '';
 
-      return NextResponse.next({
-        request: {
-          headers,
-        },
-      });
-    },
-    handleInvalidToken: async (reason) => {
-      console.info('Missing or malformed credentials', { reason });
+  // Redirect to login if session is not set
+  if (!session && protectedRoutes.includes(request.nextUrl.pathname)) {
+    const absoluteURL = new URL(ROOT_ROUTE, request.nextUrl.origin);
+    return NextResponse.redirect(absoluteURL.toString());
+  }
 
-      return redirectToLogin(request, {
-        path: '/login',
-        publicPaths: PUBLIC_PATHS,
-      });
-    },
-    handleError: async (error) => {
-      console.error('Unhandled authentication error', { error });
-
-      return redirectToLogin(request, {
-        path: '/login',
-        publicPaths: PUBLIC_PATHS,
-      });
-    },
-  });
+  // Redirect to home if session is set and user tries to access root
+  if (session && request.nextUrl.pathname === ROOT_ROUTE) {
+    const absoluteURL = new URL(HOME_ROUTE, request.nextUrl.origin);
+    return NextResponse.redirect(absoluteURL.toString());
+  }
 }
-
-export const config = {
-  matcher: ['/', '/((?!_next|api|.*\\.).*)', '/api/login', '/api/logout'],
-};
