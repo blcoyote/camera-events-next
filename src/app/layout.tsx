@@ -5,7 +5,7 @@ import Header from '@/components/Header';
 import { serverConfig } from '@/config';
 import './globals.css';
 import { ClientThemeWrapper, ThemeProvider } from '@/components/theme';
-
+import { Analytics } from "@vercel/analytics/react"
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -24,6 +24,7 @@ export default function RootLayout({
   return (
     <html lang='en'>
       <body className={inter.className}>
+        <Analytics />
         <ThemeProvider>
           <ClientThemeWrapper>
             <Header session={session} />
