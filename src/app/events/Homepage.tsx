@@ -1,8 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { getAuth, signOut } from "firebase/auth";
-import { app } from "../../firebase";
+
 
 interface HomePageProps {
   email?: string;

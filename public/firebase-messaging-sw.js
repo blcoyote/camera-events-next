@@ -19,8 +19,7 @@ const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage((payload) => {
   //TODO: fix next couple of lines
-  const notificationTitle = 'manual title'; //payload.notification.title;
-
+  const notificationTitle = payload.notification.title;
   const notificationUrl = `https://ce.elcoyote.dk${payload.data.path}/${payload.data.id}`;
   const notificationOptions = {
     body: payload.notification.body,
