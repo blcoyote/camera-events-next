@@ -1,1 +1,0 @@
-https://hackernoon.com/using-firebase-authentication-with-the-latest-nextjs-features
