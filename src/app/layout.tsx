@@ -6,6 +6,7 @@ import { serverConfig } from '@/config';
 import './globals.css';
 import { ClientThemeWrapper, ThemeProvider } from '@/components/theme';
 import { Analytics } from "@vercel/analytics/react"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -25,6 +26,7 @@ export default function RootLayout({
     <html lang='en'>
       <body className={inter.className}>
         <Analytics />
+        <SpeedInsights/>
         <ThemeProvider>
           <ClientThemeWrapper>
             <Header session={session} />
