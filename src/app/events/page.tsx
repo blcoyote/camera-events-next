@@ -5,38 +5,32 @@ import HomePage from './Homepage';
 import { firebaseAuth, firebaseCloudMessaging } from '@/libs/firebase/firebase';
 import { postFcmToken } from '@/actions/fcm-actions';
 
-  import { getMessaging, onMessage, type MessagePayload } from 'firebase/messaging';
 
   export default function Page() {
     const [fcmToken, setFcmToken] = useState<string | undefined>(undefined);
     const [accessToken, setAccessToken] = useState<string | undefined>(undefined);
     const user = firebaseAuth.currentUser;
-    const [payload, setPayload] = useState<MessagePayload | undefined>(undefined);
-    const messaging = getMessaging();
-    onMessage(messaging, (payload) => {
-      console.log('Message received. ', payload);
-      setPayload(payload);
-    });
-  firebaseAuth.currentUser?.getIdToken(true).then((token) => {
-    setAccessToken(token);
-  });
 
-  useEffect(() => {
-    if (fcmToken && accessToken) {
-      fetch(`${process.env.NEXT_PUBLIC_BASEURL}/api/v2/fcm?fcm_token=${fcmToken}&token=${accessToken}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-        .then((result) => {
-          return result.json;
+    firebaseAuth.currentUser?.getIdToken(true).then((token) => {
+      setAccessToken(token);
+    });
+
+    useEffect(() => {
+      if (fcmToken && accessToken) {
+        fetch(`${process.env.NEXT_PUBLIC_BASEURL}/api/v2/fcm?fcm_token=${fcmToken}&token=${accessToken}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
         })
-        .catch((error) => {
-          console.error('Error:', error);
-        });
-    }
-  }, [fcmToken, accessToken]);
+          .then((result) => {
+            return result.json;
+          })
+          .catch((error) => {
+            console.error('Error:', error);
+          });
+      }
+    }, [fcmToken, accessToken]);
     useEffect(() => {
       if (fcmToken && accessToken) {
         postFcmToken(fcmToken, accessToken);
@@ -73,5 +67,5 @@ import { postFcmToken } from '@/actions/fcm-actions';
       setToken();
     }, []);
 
-    return <HomePage email={user?.email ?? ''} payload={payload} />;
+    return <HomePage email={user?.email ?? ''} />;
   }
