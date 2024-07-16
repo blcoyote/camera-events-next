@@ -4,7 +4,7 @@ import { useUserSession } from '@/hooks/use-user-session';
 import { signInWithGoogle, signOutWithGoogle } from '@/libs/firebase/auth';
 import { createSession, removeSession } from '@/actions/auth-actions';
 
-export function Header({ session }: { session: string | null }) {
+export function Header({ session }: Readonly<{ session: string | null }>) {
   const { userUid } = useUserSession(session);
 
   const handleSignIn = async () => {

@@ -16,7 +16,7 @@ export async function signInWithGoogle() {
   try {
     const result = await signInWithPopup(firebaseAuth, provider);
 
-    if (!result || !result.user) {
+    if (!result?.user) {
       throw new Error('Google sign in failed');
     }
     return result.user.uid;

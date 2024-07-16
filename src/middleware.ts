@@ -5,7 +5,7 @@ import { HOME_ROUTE, ROOT_ROUTE } from './constants';
 const protectedRoutes = [HOME_ROUTE];
 
 export async function middleware(request: NextRequest) {
-  const session = request.cookies.get(serverConfig.cookieName)?.value || '';
+  const session = request.cookies.get(serverConfig.cookieName)?.value ?? '';
 
   // Redirect to login if session is not set
   if (!session && protectedRoutes.includes(request.nextUrl.pathname)) {

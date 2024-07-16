@@ -1,9 +1,7 @@
 import { clientConfig } from '@/config';
 import * as firebase from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getMessaging, getToken, onMessage, type MessagePayload } from 'firebase/messaging';
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 
 export const firebaseCloudMessaging = {
   //checking whether token is available in indexed DB
