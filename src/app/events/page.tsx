@@ -5,11 +5,18 @@ import HomePage from './Homepage';
 import { firebaseAuth, firebaseCloudMessaging } from '@/libs/firebase/firebase';
 import { postFcmToken } from '@/actions/fcm-actions';
 
-export default function Page() {
-  const [fcmToken, setFcmToken] = useState<string | undefined>(undefined);
-  const [accessToken, setAccessToken] = useState<string | undefined>(undefined);
-  const user = firebaseAuth.currentUser;
+  import { getMessaging, onMessage, type MessagePayload } from 'firebase/messaging';
 
+  export default function Page() {
+    const [fcmToken, setFcmToken] = useState<string | undefined>(undefined);
+    const [accessToken, setAccessToken] = useState<string | undefined>(undefined);
+    const user = firebaseAuth.currentUser;
+    const [payload, setPayload] = useState<MessagePayload | undefined>(undefined);
+    const messaging = getMessaging();
+    onMessage(messaging, (payload) => {
+      console.log('Message received. ', payload);
+      setPayload(payload);
+    });
   firebaseAuth.currentUser?.getIdToken(true).then((token) => {
     setAccessToken(token);
   });
@@ -30,36 +37,41 @@ export default function Page() {
         });
     }
   }, [fcmToken, accessToken]);
-
-  const getToken = async () => {
-    try {
-      const token = await firebaseCloudMessaging.init();
-      if (token) {
-        await firebaseCloudMessaging.getMessage();
-        setFcmToken(token);
+    useEffect(() => {
+      if (fcmToken && accessToken) {
+        postFcmToken(fcmToken, accessToken);
       }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  useEffect(() => {
-    navigator.serviceWorker
-      .register('/firebase-messaging-sw.js')
-      .then((registration) => console.log('Service Worker registration successful with scope: ', registration.scope))
-      .catch((err) => console.log('Service Worker registration failed: ', err));
-  }, []);
+    }, [fcmToken, accessToken]);
 
-  useEffect(() => {
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.addEventListener('message', (event) =>
-        console.log('event for the service worker', event)
-      );
-    }
-    async function setToken() {
-      await getToken();
-    }
-    setToken();
-  }, []);
+    const getToken = async () => {
+      try {
+        const token = await firebaseCloudMessaging.init();
+        if (token) {
+          await firebaseCloudMessaging.getMessage();
+          setFcmToken(token);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    useEffect(() => {
+      navigator.serviceWorker
+        .register('/firebase-messaging-sw.js')
+        .then((registration) => console.log('Service Worker registration successful with scope: ', registration.scope))
+        .catch((err) => console.log('Service Worker registration failed: ', err));
+    }, []);
 
-  return <HomePage email={user?.email ?? ''} />;
-}
+    useEffect(() => {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.addEventListener('message', (event) =>
+          console.log('event for the service worker', event)
+        );
+      }
+      async function setToken() {
+        await getToken();
+      }
+      setToken();
+    }, []);
+
+    return <HomePage email={user?.email ?? ''} payload={payload} />;
+  }
