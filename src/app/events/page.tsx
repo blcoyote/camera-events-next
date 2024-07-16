@@ -1,11 +1,24 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import HomePage from './Homepage';
 import { firebaseAuth, firebaseCloudMessaging } from '@/libs/firebase/firebase';
+import { postFcmToken } from '@/actions/fcm-actions';
 
-export default function Home() {
+export default function Page() {
   const [fcmToken, setFcmToken] = useState<string | undefined>(undefined);
+  const [accessToken, setAccessToken] = useState<string | undefined>(undefined);
+  const user = firebaseAuth.currentUser;
+
+  firebaseAuth.currentUser?.getIdToken(true).then((token) => {
+    setAccessToken(token);
+  });
+
+  useEffect(() => {
+    if (fcmToken && accessToken) {
+      postFcmToken(fcmToken, accessToken);
+    }
+  }, [fcmToken, accessToken]);
 
   const getToken = async () => {
     try {
@@ -36,9 +49,6 @@ export default function Home() {
     }
     setToken();
   }, []);
-
-  const user = firebaseAuth.currentUser;
-  const token = firebaseAuth.currentUser?.getIdToken();
 
   return <HomePage email={user?.email ?? ''} />;
 }
