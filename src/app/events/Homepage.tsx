@@ -1,14 +1,12 @@
 "use client";
 
-import { MessagePayload } from 'firebase/messaging';
 import { useRouter } from 'next/navigation';
 
 interface HomePageProps {
   email?: string;
-  payload?: MessagePayload;
 }
 
-export default function HomePage({ email, payload }: HomePageProps) {
+export default function HomePage({ email }: HomePageProps) {
   const router = useRouter();
 
   return (
@@ -17,7 +15,6 @@ export default function HomePage({ email, payload }: HomePageProps) {
       <p className='mb-8'>
         Only <strong>{email}</strong> holds the magic key to this kingdom!
       </p>
-      <p>{payload?.notification?.title}</p>
     </main>
   );
 }
