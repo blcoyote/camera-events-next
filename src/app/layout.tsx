@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { cookies } from 'next/headers';
-import './globals.css';
 import Header from '@/components/Header';
 import { serverConfig } from '@/config';
-import { useEffect, useState } from 'react';
-import { firebaseCloudMessaging } from '@/libs/firebase/firebase';
+import './globals.css';
+import { ClientThemeWrapper, ThemeProvider } from '@/components/theme';
+
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -19,13 +19,17 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = cookies().get(serverConfig.cookieName)?.value || null;
+  const session = cookies().get(serverConfig.cookieName)?.value ?? null;
 
   return (
     <html lang='en'>
       <body className={inter.className}>
-        <Header session={session} />
-        {children}
+        <ThemeProvider>
+          <ClientThemeWrapper>
+            <Header session={session} />
+            {children}
+          </ClientThemeWrapper>
+          </ThemeProvider>
       </body>
     </html>
   );
